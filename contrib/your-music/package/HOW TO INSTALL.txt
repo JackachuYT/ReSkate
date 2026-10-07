@@ -3,28 +3,32 @@ YOUR MUSIC FOR RESKATE - HOW TO INSTALL
 
 You need: skate. on Steam, already working with ReSkate on this PC.
 
+This isn't a normal mod, so it doesn't go in the Mods folder. Normal mods can
+only add things like songs, maps and outfits; they can't talk to Spotify or
+Apple Music. So this zip updates ReSkate itself, and then builds a small
+"Your Music" mod into your Mods folder for you.
+
 1. Close skate. and the ReSkate launcher.
 
 2. Open your skate. folder:
    Steam -> right-click skate. -> Manage -> Browse local files.
    (It's the folder with Skate.exe in it.)
 
-3. Copy EVERYTHING from this zip into that folder.
-   If Windows asks, choose "Replace the files in the destination".
+3. Copy EVERYTHING from this zip into that folder (beside Skate.exe,
+   NOT into Mods). If Windows asks, choose "Replace the files in the destination".
 
-4. Start ReSkateLauncher.exe from that folder.
+4. Open the new YourMusic folder and double-click "Install Your Music.bat".
+   Wait until it says Done. The first time it downloads ffmpeg (about 100 MB),
+   which it needs to build the mod. It puts the finished mod in Mods\YourMusic.
+
+5. Start ReSkateLauncher.exe from your skate. folder.
    If Windows says "Windows protected your PC", click "More info", then "Run anyway".
+   Open MODS and make sure YourMusic is turned on. Then press PLAY.
 
-5. Open the YourMusic folder (it's now inside your skate. folder) and double-click
-   "Install Your Music.bat". Wait until it says Done. The first time it downloads
-   ffmpeg (about 100 MB), which it needs to build the mod.
+6. A note in the top-left corner should say "ReSkate loaded (development build)".
+   That means it's our version.
 
-6. In the ReSkate launcher, open MODS and make sure YourMusic is turned on.
-
-7. Press PLAY. A note in the top-left corner should say
-   "ReSkate loaded (development build)". That means it's our version.
-
-8. Open Spotify or Apple Music and play a song. Then, in the game, open the music
+7. Open Spotify or Apple Music and play a song. Then, in the game, open the music
    screen and pick the "Your Music" playlist. The game goes quiet and your music plays.
    Then go through TEST CHECKLIST.txt.
 
