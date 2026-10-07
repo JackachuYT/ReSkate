@@ -7,6 +7,8 @@
 #include "Extension/Music/local_music_ui.h"
 #include "Extension/Music/local_music_shelf.h"
 #include "Extension/Music/local_music_playback.h"
+#include "Extension/YourMusic/media_session.h"
+#include "Extension/YourMusic/radio_hook.h"
 #include "Extension/News/local_news_runtime.h"
 #include "Extension/Objects/local_buildkit_labels.h"
 #include "Extension/Objects/local_buildkit_limits.h"
@@ -342,6 +344,7 @@ void local_profile_before_level_transition(unsigned next) noexcept {
     if (!s.active.load(std::memory_order_acquire)) return;
     std::lock_guard lock(s.native_mutex);
     music_shelf_before_level_transition(next);
+    dingosdk::your_music::radio_before_level_transition();
     news_runtime().pending.before_transition(next);
     object_runtime().pending.before_transition(next);
     auto& placements = placements_runtime();
@@ -579,6 +582,10 @@ bool initialize_local_profile(std::uintptr_t base, bool authored_offline,
             if (hook_enable(target) != HookOk) throw std::runtime_error("Cannot enable local profile hook");
         }
         if (playback_ready) activate_music_playback();
+        if (playback_ready) {
+            dingosdk::your_music::set_media_popups(local_preference("YourMusicPopups").value_or(true));
+            dingosdk::your_music::start_media_session();
+        }
         initialize_placement_store(path);
         initialize_park_editor(path.parent_path());
         set_park_mods_root(mods::engine_data_root());

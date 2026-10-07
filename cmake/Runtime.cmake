@@ -147,6 +147,7 @@ add_library(dingosdk_runtime SHARED
     Extension/Music/local_music_ui.cpp
     Extension/Music/local_music_shelf.cpp
     Extension/YourMusic/media_session.cpp
+    Extension/YourMusic/radio_hook.cpp
     Extension/Objects/local_buildkit_labels.cpp
     Extension/Objects/local_buildkit_limits.cpp
     Extension/Progression/local_rip_score_runtime.cpp
