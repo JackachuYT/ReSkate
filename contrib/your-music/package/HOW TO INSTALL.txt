@@ -24,8 +24,9 @@ You need: skate. on Steam, already working with ReSkate on this PC.
 7. Press PLAY. A note in the top-left corner should say
    "ReSkate loaded (development build)". That means it's our version.
 
-8. In the game, open the music screen. You should see a "Your Music" playlist.
-   Picking it makes the game go quiet. (Step 1 of the mod stops here for now.)
+8. Open Spotify or Apple Music and play a song. Then, in the game, open the music
+   screen and pick the "Your Music" playlist. The game goes quiet and your music plays.
+   Then go through TEST CHECKLIST.txt.
 
 Run "Install Your Music.bat" again whenever skate. or ReSkate updates.
 
