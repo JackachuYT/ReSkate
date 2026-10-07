@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- Spec: `contrib/your-music/design.md`. Branch: `your-music` on `JackachuYT/ReSkate`.
+- Spec: `contrib/your-music/design.md`. Branch: `main` on `JackachuYT/ReSkate` (originally `your-music`).
 - Supported game build only: `Engine/Game/Build/20260929` (Steam build `25414733`). No new game addresses are needed in step 1.
 - Builds must keep `DINGOSDK_LAUNCHER_AUTO_UPDATE=OFF` and set `DINGOSDK_BACKTRACE_URL` empty (no crash uploads to the ReSkate project's account from our modified build).
 - Warnings are errors (`/W4 /WX`). New code compiles warning-free under MSVC; pure headers also compile with `clang++ -std=c++20 -Wall -Wextra -Werror` on the Mac for fast test runs.
