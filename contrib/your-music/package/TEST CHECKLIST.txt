@@ -1,0 +1,28 @@
+YOUR MUSIC - THINGS TO TRY (tell Claude what happened for each)
+===============================================================
+
+Before you start: open Spotify or Apple Music and play any song, then pause it.
+
+1. Start skate. with ReSkateLauncher. Press Insert -> SETTINGS.
+   Does the YOUR MUSIC card say "Controlling Spotify" (or Apple Music)?
+
+2. Open the game's music screen and pick the "Your Music" playlist.
+   Does the game go quiet and your song start playing?
+   Does a note with the song name pop up in the top-left corner?
+
+3. Press the game's skip / next song button.
+   Does your app skip to the next song?
+
+4. Pick one of the game's own playlists.
+   Does your app pause and the game's music come back?
+
+5. Pick "Your Music" again, then pause your app yourself.
+   Does it stay paused (the game shouldn't restart it)?
+
+6. Fast travel or change map while Your Music is playing.
+   Does your music keep going (or come back) after loading?
+
+7. Turn "Song pop-ups" off in Insert -> SETTINGS -> YOUR MUSIC.
+   Do the song-name notes stop?
+
+If anything goes wrong, send Claude the file logs\ReSkate.log from your skate. folder.
