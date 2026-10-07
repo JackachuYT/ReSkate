@@ -19,7 +19,7 @@ jobs:
         run: cmake --preset vs2022-x64 -DDINGOSDK_BUILD_LAUNCHER_TESTS=ON -DDINGOSDK_LAUNCHER_AUTO_UPDATE=OFF "-DDINGOSDK_BACKTRACE_URL="
 
       - name: Build
-        run: cmake --build --preset release --parallel 4 --target dingosdk_runtime dingosdk_launcher dingosdk_music_playback_policy_tests dingosdk_your_music_policy_tests
+        run: cmake --build --preset release --parallel 4 --target dingosdk_runtime dingosdk_launcher dingosdk_music_playback_policy_tests dingosdk_your_music_policy_tests dingosdk_your_music_choice_tests
 
       - name: Test
         run: ctest --test-dir build/vs2022-x64 -C Release -R "^(music_playback_policy|your_music_.*)$" --output-on-failure --no-tests=error
