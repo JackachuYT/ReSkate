@@ -23,7 +23,7 @@ if (Test-Path (Join-Path $kit 'song')) {
 }
 
 Copy-Item (Join-Path $root 'LICENSE') (Join-Path $stage 'licenses\ReSkate-LICENSE.txt')
-Get-ChildItem (Join-Path $root 'External') -Recurse -File -Include 'LICENSE*', 'COPYING*' | ForEach-Object {
+Get-ChildItem (Join-Path $root 'External') -Recurse -File -Include '*LICENSE*', '*COPYING*' | ForEach-Object {
     Copy-Item $_.FullName (Join-Path $stage ('licenses\' + $_.Directory.Name + '-' + $_.Name))
 }
 Compress-Archive -Path (Join-Path $stage '*') -DestinationPath $Out -Force
