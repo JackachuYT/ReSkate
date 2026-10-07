@@ -11,13 +11,15 @@ Remove-Item $stage -Recurse -Force -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Path $stage, (Join-Path $stage 'licenses') | Out-Null
 
 Copy-Item (Join-Path $Build 'ReSkate.dll'), (Join-Path $Build 'ReSkateLauncher.exe') $stage
-Get-ChildItem $kit -File | Copy-Item -Destination $stage
+$scripts = 'Install Your Music.bat', 'install-your-music.ps1'
+Get-ChildItem $kit -File | Where-Object { $scripts -notcontains $_.Name } | Copy-Item -Destination $stage
 
 $modKit = Join-Path $stage 'YourMusic'
 if (Test-Path (Join-Path $kit 'song')) {
     New-Item -ItemType Directory -Path $modKit | Out-Null
     Get-ChildItem $kit -Directory | Copy-Item -Destination $modKit -Recurse
     Copy-Item $Packer (Join-Path $modKit 'packer') -Recurse
+    $scripts | ForEach-Object { Copy-Item (Join-Path $kit $_) $modKit }
 }
 
 Copy-Item (Join-Path $root 'LICENSE') (Join-Path $stage 'licenses\ReSkate-LICENSE.txt')

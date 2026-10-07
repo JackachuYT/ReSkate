@@ -15,8 +15,19 @@ You need: skate. on Steam, already working with ReSkate on this PC.
 4. Start ReSkateLauncher.exe from that folder.
    If Windows says "Windows protected your PC", click "More info", then "Run anyway".
 
-5. Press PLAY. A note in the top-left corner should say
+5. Open the YourMusic folder (it's now inside your skate. folder) and double-click
+   "Install Your Music.bat". Wait until it says Done. The first time it downloads
+   ffmpeg (about 100 MB), which it needs to build the mod.
+
+6. In the ReSkate launcher, open MODS and make sure YourMusic is turned on.
+
+7. Press PLAY. A note in the top-left corner should say
    "ReSkate loaded (development build)". That means it's our version.
+
+8. In the game, open the music screen. You should see a "Your Music" playlist.
+   Picking it makes the game go quiet. (Step 1 of the mod stops here for now.)
+
+Run "Install Your Music.bat" again whenever skate. or ReSkate updates.
 
 To go back to normal ReSkate: download it again from
 https://github.com/Dingo-Shenanigans/ReSkate/releases and copy it over these files.
