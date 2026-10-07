@@ -25,4 +25,4 @@ Before you start: open Spotify or Apple Music and play any song, then pause it.
 7. Turn "Song pop-ups" off in Insert -> SETTINGS -> YOUR MUSIC.
    Do the song-name notes stop?
 
-If anything goes wrong, send Claude the file logs\ReSkate.log from your skate. folder.
+If anything goes wrong, include logs\ReSkate.log from your skate. folder when you report it.

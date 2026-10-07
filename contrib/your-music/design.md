@@ -2,7 +2,7 @@
 
 Date: 2026-10-08
 Status: approved by user, pending spec review
-Upstream: [Dingo-Shenanigans/ReSkate](https://github.com/Dingo-Shenanigans/ReSkate) at `d04920c` (game build `20260929`, Steam build `25414733`)
+Upstream: [Dingo-Shenanigans/ReSkate](https://github.com/Dingo-Shenanigans/ReSkate) at release `v1.1.5` (game build `20260929`, Steam build `25414733`)
 
 ## Summary (plain language)
 
@@ -64,10 +64,12 @@ Each step has its own implementation plan. Step 1 includes a short investigation
   go in `Engine/Game/Build/20260929/your_music.h`, never in feature code (ReSkate rule).
 - Local checkout: `/Users/jackachu/Documents/aura/reskate-your-music/` (this folder).
 - The user has no Windows build tools. A GitHub Actions workflow on `windows-latest` builds Release,
-  runs the unit tests and uploads a zip containing `ReSkate.dll`, `ReSkateLauncher.exe` and
-  `Mods/YourMusic/`. Builds keep `DINGOSDK_LAUNCHER_AUTO_UPDATE=OFF` so the launcher never replaces our
-  DLL with the official one.
-- The user installs by extracting the zip beside `Skate.exe` (step 2 of ReSkate's own install guide).
+  runs the unit tests and uploads a zip containing only `ReSkate.dll`, `HOW TO INSTALL.txt` and the
+  `YourMusic/` installer kit. Players keep their official ReSkate launcher and turn off its
+  "Install ReSkate updates" setting (SETTINGS -> ADVANCED), which otherwise restores the official DLL;
+  turning it back on is the uninstall. Our code sits on an official release tag so the DLL matches the
+  launcher players have.
+- The user copies `ReSkate.dll` and `YourMusic/` beside `Skate.exe` and runs `YourMusic\Install Your Music.bat`.
 
 ## How it works
 

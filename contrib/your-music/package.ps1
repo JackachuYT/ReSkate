@@ -1,3 +1,7 @@
+# Stages the release zip: only what Your Music adds to a working ReSkate install.
+#   ReSkate.dll           ReSkate with Your Music built in (it replaces the player's ReSkate.dll)
+#   HOW TO INSTALL.txt
+#   YourMusic\            installer, silent song, ReSkateMusicPacker, test checklist, licenses
 param(
     [Parameter(Mandatory)] [string] $Build,
     [Parameter(Mandatory)] [string] $Packer,
@@ -7,24 +11,25 @@ $ErrorActionPreference = 'Stop'
 $root = Resolve-Path (Join-Path $PSScriptRoot '..\..')
 $kit = Join-Path $PSScriptRoot 'package'
 $stage = Join-Path ([System.IO.Path]::GetTempPath()) 'your-music-package'
-Remove-Item $stage -Recurse -Force -ErrorAction SilentlyContinue
-New-Item -ItemType Directory -Path $stage, (Join-Path $stage 'licenses') | Out-Null
-
-Copy-Item (Join-Path $Build 'ReSkate.dll'), (Join-Path $Build 'ReSkateLauncher.exe') $stage
-$scripts = 'Install Your Music.bat', 'install-your-music.ps1'
-Get-ChildItem $kit -File | Where-Object { $scripts -notcontains $_.Name } | Copy-Item -Destination $stage
-
 $modKit = Join-Path $stage 'YourMusic'
-if (Test-Path (Join-Path $kit 'song')) {
-    New-Item -ItemType Directory -Path $modKit | Out-Null
-    Get-ChildItem $kit -Directory | Copy-Item -Destination $modKit -Recurse
-    Copy-Item $Packer (Join-Path $modKit 'packer') -Recurse
-    $scripts | ForEach-Object { Copy-Item (Join-Path $kit $_) $modKit }
-}
+$licenses = Join-Path $modKit 'licenses'
+Remove-Item $stage -Recurse -Force -ErrorAction SilentlyContinue
+New-Item -ItemType Directory -Path $stage, $modKit, $licenses | Out-Null
 
-Copy-Item (Join-Path $root 'LICENSE') (Join-Path $stage 'licenses\ReSkate-LICENSE.txt')
+Copy-Item (Join-Path $Build 'ReSkate.dll') $stage
+Copy-Item (Join-Path $kit 'HOW TO INSTALL.txt') $stage
+Get-ChildItem $kit -File | Where-Object { $_.Name -ne 'HOW TO INSTALL.txt' } | Copy-Item -Destination $modKit
+Get-ChildItem $kit -Directory | Copy-Item -Destination $modKit -Recurse
+Copy-Item $Packer (Join-Path $modKit 'packer') -Recurse
+
+# ReSkate.dll is GPL-3.0 ReSkate plus Your Music, statically linked with the libraries in External/.
+Copy-Item (Join-Path $root 'LICENSE') (Join-Path $licenses 'ReSkate-LICENSE.txt')
 Get-ChildItem (Join-Path $root 'External') -Recurse -File -Include '*LICENSE*', '*COPYING*' | ForEach-Object {
-    Copy-Item $_.FullName (Join-Path $stage ('licenses\' + $_.Directory.Name + '-' + $_.Name))
+    Copy-Item $_.FullName (Join-Path $licenses ($_.Directory.Name + '-' + $_.Name))
 }
+Set-Content (Join-Path $licenses 'SOURCE.txt') @(
+    'ReSkate.dll in this download is ReSkate (GPL-3.0, https://github.com/Dingo-Shenanigans/ReSkate)',
+    'with Your Music added. Its complete source code is at https://github.com/JackachuYT/ReSkate'
+)
 Compress-Archive -Path (Join-Path $stage '*') -DestinationPath $Out -Force
 Write-Host "Packaged $Out"
