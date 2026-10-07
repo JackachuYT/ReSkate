@@ -1,6 +1,7 @@
 #include "local_music_playback.h"
 
 #include "local_music_playback_policy.h"
+#include "Extension/YourMusic/radio_hook.h"
 #include "Engine/Core/Hooks/hooks.h"
 #include "Engine/Core/Platform/memory.h"
 #include "Engine/Game/Build/20260929/local_music.h"
@@ -249,7 +250,9 @@ MusicSelectNext& music_select_next_original() noexcept { return select_next; }
 std::int32_t __fastcall music_select_next_hook(std::uintptr_t queue, std::uintptr_t playlist_asset) {
     if (select_next) {
         apply_policy(queue, playlist_asset);
-        return select_next(queue, playlist_asset);
+        const auto selected = select_next(queue, playlist_asset);
+        dingosdk::your_music::on_radio_select(queue, playlist_asset, selected);
+        return selected;
     }
     return -1;
 }
