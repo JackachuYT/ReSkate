@@ -2,6 +2,7 @@
 #include "skate_menu_internal.h"
 #include "Engine/Core/Profiling/profiler.h"
 #include "Extension/Music/local_music_playback.h"
+#include "Extension/YourMusic/media_session.h"
 #include "Extension/Profile/local_profile_runtime.h"
 
 #include <algorithm>
@@ -17,6 +18,23 @@ void ui_page(SkateMenu& menu, const Model& model, const CallbacksV3& callbacks) 
         dingosdk::profile_runtime::set_music_shuffle_enabled(shuffle);
         dingosdk::profile_runtime::set_local_preference("MusicShuffle", shuffle);
     }
+    end_card();
+
+    begin_card(menu, "your-music", "YOUR MUSIC");
+    bool popups = dingosdk::your_music::media_popups();
+    if (toggle_row(menu, "Song pop-ups", "Show the song name when it changes while Your Music plays.", popups)) {
+        dingosdk::your_music::set_media_popups(popups);
+        dingosdk::profile_runtime::set_local_preference("YourMusicPopups", popups);
+    }
+    {
+        const auto now = dingosdk::your_music::media_now_playing();
+        const auto status = now.app.empty()
+            ? std::string("No music app found. Open Spotify or Apple Music.")
+            : "Controlling " + now.app + (now.title.empty() ? std::string() : ": " + now.title +
+                (now.artist.empty() ? std::string() : " - " + now.artist));
+        note(status.c_str());
+    }
+    note("Pick the Your Music playlist in the game's music screen to play it.");
     end_card();
 
     begin_card(menu, "on-screen", "ON SCREEN");
