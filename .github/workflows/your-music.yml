@@ -2,7 +2,7 @@ name: your-music
 
 on:
   push:
-    branches: [your-music]
+    branches: [main]
     tags: ["your-music-v*"]
   workflow_dispatch:
 

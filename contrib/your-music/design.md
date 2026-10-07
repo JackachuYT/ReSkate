@@ -58,8 +58,8 @@ Each step has its own implementation plan. Step 1 includes a short investigation
 
 ## Where the code lives
 
-- A fork of ReSkate on the user's GitHub account (`JackachuYT/ReSkate`), branch `your-music`. The fork is
-  public, as GPL-3.0 requires for a distributed modified ReSkate.
+- A fork of ReSkate on the user's GitHub account (`JackachuYT/ReSkate`), one branch: `main` (ReSkate plus
+  this feature). The fork is public, as GPL-3.0 requires for a distributed modified ReSkate.
 - New code goes in `Extension/YourMusic/`, following ReSkate's layout. Game addresses and fingerprints
   go in `Engine/Game/Build/20260929/your_music.h`, never in feature code (ReSkate rule).
 - Local checkout: `/Users/jackachu/Documents/aura/reskate-your-music/` (this folder).
