@@ -16,31 +16,28 @@ the ReSkate team.
 ## What you need
 
 - A Windows PC with **skate.** on Steam.
-- **[ReSkate](https://github.com/Dingo-Shenanigans/ReSkate) 1.1.5** already working on it.
+- **[ReSkate](https://github.com/Dingo-Shenanigans/ReSkate)** already working on it.
 - **Spotify** or **Apple Music** (the Windows app), or any other music app.
 
 ## How to install
 
-The download only has two things: a **`ReSkate.dll`** (your normal ReSkate 1.1.5 with Your Music built
-in) and a **`YourMusic`** folder. Your Music has to replace ReSkate's `ReSkate.dll` because normal mods
-can only add things like songs, maps and outfits, and can't talk to Spotify or Apple Music.
+You only do this **once**. After that, Your Music keeps itself **and ReSkate** up to date automatically,
+in the background, with no pop-ups.
 
-1. Download `ReSkate-YourMusic.zip` from **[Releases](https://github.com/JackachuYT/ReSkate/releases)**.
-2. Open the ReSkate launcher, go to **SETTINGS** → **ADVANCED**, and turn **off**
-   **Install ReSkate updates**. If it's on, the launcher puts the normal `ReSkate.dll` back every time it
-   starts. Then close the launcher.
+1. Download `ReSkate-YourMusic.zip` from the **[latest release](https://github.com/JackachuYT/ReSkate/releases/latest)**.
+2. Close skate. and the ReSkate launcher.
 3. Open your skate. folder: in Steam, right-click **skate.** → **Manage** → **Browse local files**.
    It's the folder with `Skate.exe` and `ReSkateLauncher.exe` in it.
 4. Copy **`ReSkate.dll`** and the **`YourMusic`** folder from the zip into that folder (**not** into
-   `Mods`). When Windows asks, choose **Replace the file in the destination**.
+   `Mods`). When Windows asks, choose **Replace the file in the destination**. Your Music lives inside
+   `ReSkate.dll` because normal mods can only add things like songs, maps and outfits, and can't talk to
+   Spotify or Apple Music.
 5. Open the `YourMusic` folder and double-click **`Install Your Music.bat`**. Wait until it says
-   **Done**. The first time, it downloads ffmpeg (about 100 MB), which it needs to build the mod. It puts
-   the "Your Music" playlist mod into your `Mods` folder for you.
-6. Start **`ReSkateLauncher.exe`**. Open **MODS**, make sure **YourMusic** is turned on, and press
-   **PLAY**. A note in the top-left corner should say **"ReSkate loaded (development build)"**. That means
-   Your Music is running.
-
-Run `Install Your Music.bat` again whenever skate. updates.
+   **Done**. It builds the "Your Music" playlist mod into your `Mods` folder (the first time it downloads
+   ffmpeg, about 100 MB), turns off the ReSkate launcher's own updates (Your Music does ReSkate's updates
+   from now on), and sets up the automatic updater.
+6. Start **`ReSkateLauncher.exe`** and press **PLAY**. A note in the top-left corner should say
+   **"ReSkate …-yourmusic… loaded"**. That means Your Music is running.
 
 ## How to use it
 
@@ -53,10 +50,21 @@ and turn the song pop-ups on or off.
 
 If something isn't working, the file `logs\ReSkate.log` in your skate. folder shows what happened.
 
+## Automatic updates
+
+Every hour, while skate. isn't running, Your Music checks this page for a new release and installs it:
+a new `ReSkate.dll`, the matching official ReSkate launcher, and a rebuilt playlist mod after skate.
+updates. Every download is checked against its published checksum first. It shows up in Windows Task
+Scheduler as **Your Music for ReSkate updater**, and writes what it did to `YourMusic\update.log`.
+
+New releases appear on their own: a GitHub robot checks for new ReSkate versions every few hours, adds
+Your Music to them, and publishes the result
+([follow-reskate](.github/workflows/follow-reskate.yml), [build](.github/workflows/your-music.yml)).
+
 ## How to uninstall
 
-In the ReSkate launcher, turn **Install ReSkate updates** back on and start it once; it puts the normal
-`ReSkate.dll` back. Then delete the `YourMusic` folder and `Mods\YourMusic`.
+Double-click `YourMusic\Uninstall Your Music.bat`, start the ReSkate launcher once (it puts the normal
+`ReSkate.dll` back), then delete the `YourMusic` folder.
 
 ## How it works
 
@@ -68,9 +76,9 @@ your music app plays them as normal, and Your Music works the controls:
   media controls, the same ones your keyboard's play/pause keys use). When the game switches to any
   other song, it tells your app to pause. Pressing skip in the game skips in your app.
 
-The code lives in `Extension/YourMusic/`, with small hooks in three ReSkate files. The design and plans
-are in [`contrib/your-music/`](contrib/your-music/). GitHub builds every release
-([workflow](.github/workflows/your-music.yml)). To build it yourself, follow ReSkate's
+The code lives in `Extension/YourMusic/`, with small hooks in three ReSkate files. The installer, updater
+and uninstaller are in `contrib/your-music/package/`, and the design and plans in
+[`contrib/your-music/`](contrib/your-music/). To build it yourself, follow ReSkate's
 [building instructions](https://github.com/Dingo-Shenanigans/ReSkate#building-from-source).
 
 ## Credits
