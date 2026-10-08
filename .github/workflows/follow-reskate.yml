@@ -1,0 +1,67 @@
+name: follow-reskate
+
+# Every three hours: if ReSkate has published a release that main isn't built on yet, move Your Music's
+# commits onto it, push, tag your-music-v<version>-1 and start the build that publishes it. Installed
+# copies then update themselves. If our changes don't apply cleanly, this run fails (GitHub emails the
+# repository owner) and players stay on the last release until it's fixed by hand.
+on:
+  schedule:
+    - cron: "17 */3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: follow-reskate
+
+jobs:
+  follow:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Look for a new ReSkate release
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch --quiet --force --tags https://github.com/Dingo-Shenanigans/ReSkate.git
+          latest=$(gh release view --repo Dingo-Shenanigans/ReSkate --json tagName --jq .tagName)
+          base=$(git describe --tags --abbrev=0 --match 'v[0-9]*' HEAD)
+          echo "latest=$latest" >> "$GITHUB_OUTPUT"
+          echo "base=$base" >> "$GITHUB_OUTPUT"
+          if git merge-base --is-ancestor "$latest" HEAD; then
+            echo "Your Music is already built on ReSkate $base (latest release: $latest)."
+            echo "new=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ReSkate $latest is out; Your Music is on $base."
+            echo "new=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Move Your Music onto it and start the release build
+        if: steps.check.outputs.new == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LATEST: ${{ steps.check.outputs.latest }}
+          BASE: ${{ steps.check.outputs.base }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git rebase --onto "$LATEST" "$BASE" main; then
+            git rebase --abort
+            echo "::error::Your Music's changes don't apply cleanly to ReSkate $LATEST. Rebase main onto $LATEST by hand."
+            exit 1
+          fi
+          tag="your-music-${LATEST}-1"
+          git tag "$tag"
+          git push origin "refs/tags/$LATEST"
+          git push --force-with-lease=main:"origin/main" origin main
+          git push origin "refs/tags/$tag"
+          # Pushes made with this token don't start other workflows, so start the build directly.
+          gh workflow run your-music.yml --ref "$tag"
+          echo "Started the build for $tag."

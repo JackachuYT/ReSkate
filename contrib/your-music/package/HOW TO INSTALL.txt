@@ -1,17 +1,12 @@
 YOUR MUSIC FOR RESKATE - HOW TO INSTALL
 =======================================
 
-You need: skate. on Steam, with ReSkate 1.1.5 already working on this PC.
+You need: skate. on Steam, with ReSkate already working on this PC.
 
-This download only has two things:
-  - ReSkate.dll: your normal ReSkate 1.1.5 with Your Music built in. It has to
-    replace ReSkate's own ReSkate.dll, because normal mods can't talk to Spotify
-    or Apple Music.
-  - the YourMusic folder: builds the small "Your Music" playlist mod.
+You only do this once. After that, Your Music keeps itself AND ReSkate up to
+date automatically, in the background, with no pop-ups.
 
-1. Open the ReSkate launcher. Go to SETTINGS -> ADVANCED and turn OFF
-   "Install ReSkate updates". (If it's on, the launcher puts the normal
-   ReSkate.dll back every time it starts.) Then close the launcher.
+1. Close skate. and the ReSkate launcher.
 
 2. Open your skate. folder:
    Steam -> right-click skate. -> Manage -> Browse local files.
@@ -19,22 +14,27 @@ This download only has two things:
 
 3. Copy ReSkate.dll and the YourMusic folder from this zip into that folder,
    NOT into the Mods folder. When Windows asks, choose "Replace the file in the destination".
+   (Your Music lives inside ReSkate.dll, because normal mods can't talk to
+   Spotify or Apple Music.)
 
 4. Open the YourMusic folder and double-click "Install Your Music.bat".
-   Wait until it says Done. The first time it downloads ffmpeg (about 100 MB),
-   which it needs to build the mod. It puts the "Your Music" playlist mod into
-   your Mods folder for you.
+   Wait until it says Done. It:
+     - builds the "Your Music" playlist mod into your Mods folder (the first time
+       it downloads ffmpeg, about 100 MB, which it needs for that),
+     - turns off the ReSkate launcher's own updates (Your Music does ReSkate's
+       updates from now on, so the launcher doesn't swap its ReSkate.dll back),
+     - sets up the automatic updater.
 
-5. Start ReSkateLauncher.exe. Open MODS, make sure YourMusic is turned on, and
-   press PLAY. A note in the top-left corner should say
-   "ReSkate loaded (development build)". That means Your Music is running.
+5. Start ReSkateLauncher.exe and press PLAY. A note in the top-left corner should
+   say "ReSkate ...-yourmusic... loaded". That means Your Music is running.
 
 6. Open Spotify or Apple Music and play a song. Then, in the game, open the music
-   screen and pick the "Your Music" playlist. The game goes quiet and your music
-   plays. To help test, go through YourMusic\TEST CHECKLIST.txt.
+   screen and pick the "Your Music" playlist. The game goes quiet and your music plays.
 
-Run "Install Your Music.bat" again whenever skate. updates.
+AUTOMATIC UPDATES: every hour, while skate. isn't running, Your Music checks for a
+new version (a new ReSkate or a Your Music fix) and installs it. It also rebuilds
+the playlist mod after skate. updates. What it did is written to YourMusic\update.log.
+It shows up in Windows Task Scheduler as "Your Music for ReSkate updater".
 
-TO UNINSTALL: in the launcher, turn "Install ReSkate updates" back on and start it
-once; it puts the normal ReSkate.dll back. Then delete the YourMusic folder and
-Mods\YourMusic.
+TO UNINSTALL: double-click YourMusic\Uninstall Your Music.bat, start the ReSkate
+launcher once (it puts the normal ReSkate.dll back), then delete the YourMusic folder.

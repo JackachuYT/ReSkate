@@ -65,11 +65,15 @@ Each step has its own implementation plan. Step 1 includes a short investigation
 - Local checkout: `/Users/jackachu/Documents/aura/reskate-your-music/` (this folder).
 - The user has no Windows build tools. A GitHub Actions workflow on `windows-latest` builds Release,
   runs the unit tests and uploads a zip containing only `ReSkate.dll`, `HOW TO INSTALL.txt` and the
-  `YourMusic/` installer kit. Players keep their official ReSkate launcher and turn off its
-  "Install ReSkate updates" setting (SETTINGS -> ADVANCED), which otherwise restores the official DLL;
-  turning it back on is the uninstall. Our code sits on an official release tag so the DLL matches the
-  launcher players have.
-- The user copies `ReSkate.dll` and `YourMusic/` beside `Skate.exe` and runs `YourMusic\Install Your Music.bat`.
+  `YourMusic/` kit. Our commits sit on an official ReSkate release tag, so the DLL matches that release's
+  launcher.
+- **Install once, then automatic updates** (user's design; details in `updates-plan.md`). The installer
+  builds the playlist mod, turns the ReSkate launcher's own updater off (it would restore the official
+  DLL), and registers an hourly Task Scheduler job that runs `update-your-music.ps1` with no window or
+  prompts. It installs the latest Your Music release, the official launcher matching its ReSkate base,
+  and rebuilds the mod after skate. updates. A GitHub robot (`follow-reskate.yml`) rebases our commits
+  onto each new ReSkate release and publishes a matching Your Music release.
+- The user copies `ReSkate.dll` and `YourMusic/` beside `Skate.exe` and runs `YourMusic\Install Your Music.bat` once.
 
 ## How it works
 
