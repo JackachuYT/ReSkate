@@ -1,40 +1,44 @@
-# Builds the Your Music companion mod (one silent song and the "Your Music" playlist) into
-# Mods\YourMusic beside Skate.exe. ReSkateMusicPacker needs this PC's game files, so this
-# runs here rather than on our build server.
-$ErrorActionPreference = 'Stop'
-$kit = $PSScriptRoot
-$game = Split-Path $kit -Parent
-$packer = Join-Path $kit 'packer\ReSkateMusicPacker.exe'
-$ffmpeg = Join-Path $kit 'ffmpeg'
+# One-time Your Music install. After this, Your Music keeps itself and ReSkate up to date in the
+# background (update-your-music.ps1, run hourly by Windows Task Scheduler, no windows or prompts).
+#   1. builds Mods\YourMusic (one silent song and the "Your Music" playlist) from this PC's game files
+#   2. turns off the ReSkate launcher's own updater, which would put the official ReSkate.dll back
+#   3. registers the hidden updater task and runs it once
+. (Join-Path $PSScriptRoot 'your-music-common.ps1')
 
-function Invoke-Packer([string[]] $Arguments) {
-    # The packer is a windowed app; Start-Process -Wait keeps its console output here and waits for it.
-    $quoted = $Arguments | ForEach-Object { '"' + $_ + '"' }
-    $process = Start-Process -FilePath $packer -ArgumentList ($quoted -join ' ') -Wait -NoNewWindow -PassThru
-    return $process.ExitCode
+function Register-Updater {
+    $updater = Join-Path $KitDir 'update-your-music.ps1'
+    # conhost --headless runs PowerShell without opening a console window.
+    $action = New-ScheduledTaskAction -Execute 'conhost.exe' -Argument (
+        '--headless powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "' + $updater + '"')
+    $triggers = @(New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(5) -RepetitionInterval (New-TimeSpan -Hours 1))
+    $user = "$env:USERDOMAIN\$env:USERNAME"
+    $principal = New-ScheduledTaskPrincipal -UserId $user -LogonType Interactive -RunLevel Limited
+    $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries `
+        -ExecutionTimeLimit (New-TimeSpan -Hours 1) -MultipleInstances IgnoreNew
+    $description = 'Keeps Your Music for ReSkate and ReSkate up to date. Remove it with YourMusic\Uninstall Your Music.bat.'
+    try {
+        # Also at log on, where Windows allows that without administrator rights.
+        Register-ScheduledTask -TaskName $TaskName -Action $action -Principal $principal -Settings $settings -Description $description `
+            -Trigger ($triggers + (New-ScheduledTaskTrigger -AtLogOn -User $user)) -Force | Out-Null
+    } catch {
+        Register-ScheduledTask -TaskName $TaskName -Action $action -Principal $principal -Settings $settings -Description $description `
+            -Trigger $triggers -Force | Out-Null
+    }
+    Write-Log 'Automatic updates set up (checks every hour in the background).'
 }
 
 try {
-    if (-not (Test-Path (Join-Path $game 'Skate.exe'))) {
-        throw "Put the YourMusic folder inside your skate. folder (the one with Skate.exe), then run this again."
-    }
-    if (Get-Process -Name 'Skate' -ErrorAction SilentlyContinue) {
-        throw "Close skate. first, then run this again."
-    }
-    Write-Host 'Step 1 of 2: getting ffmpeg (only needed the first time, about 100 MB)...'
-    if (-not (Test-Path (Join-Path $ffmpeg 'ffmpeg.exe'))) {
-        if ((Invoke-Packer @('--get-ffmpeg', $ffmpeg)) -ne 0) { throw 'Could not download ffmpeg.' }
-    }
-    $env:PATH = $ffmpeg + ';' + $env:PATH
-
-    Write-Host 'Step 2 of 2: building the Your Music mod...'
-    $out = Join-Path $game 'Mods\YourMusic'
-    $arguments = @($game, (Join-Path $kit 'song'), $out, '--name', 'YourMusic', '--playlist', 'Your Music',
-                   '--no-normalize', '--bitrate', '64', '--generate-playlist-artwork', 'Your Music')
-    if ((Invoke-Packer $arguments) -ne 0) { throw 'The music packer failed. The messages above say why.' }
-
+    Test-GameFolder
+    if (Test-GameRunning) { throw 'Close skate. and the ReSkate launcher first, then run this again.' }
+    Write-Host 'Step 1 of 3: building the Your Music playlist mod...'
+    Build-YourMusicMod
+    Write-Host 'Step 2 of 3: handing ReSkate updates over to Your Music...'
+    Set-LauncherUpdates $false
+    Write-Host 'Step 3 of 3: setting up automatic updates...'
+    Register-Updater
+    & (Join-Path $KitDir 'update-your-music.ps1')
     Write-Host ''
-    Write-Host 'Done! Now open ReSkateLauncher, go to MODS, and make sure YourMusic is turned on.' -ForegroundColor Green
+    Write-Host 'Done! Start ReSkateLauncher and press PLAY. From now on Your Music updates itself.' -ForegroundColor Green
 } catch {
     Write-Host ''
     Write-Host $_.Exception.Message -ForegroundColor Red

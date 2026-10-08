@@ -25,4 +25,7 @@ Before you start: open Spotify or Apple Music and play any song, then pause it.
 7. Turn "Song pop-ups" off in Insert -> SETTINGS -> YOUR MUSIC.
    Do the song-name notes stop?
 
+8. Updates: open YourMusic\update.log. Does it end with "Up to date: Your Music ..."?
+   In Windows, open Task Scheduler. Is "Your Music for ReSkate updater" listed?
+
 If anything goes wrong, include logs\ReSkate.log from your skate. folder when you report it.

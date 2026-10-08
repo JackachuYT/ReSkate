@@ -1,5 +1,8 @@
 name: your-music
 
+# Pushes to main build and test. Tags your-music-v<ReSkate version>-<n> (pushed by hand, or by the
+# follow-reskate robot through workflow_dispatch) also publish a release that installed copies of
+# Your Music update themselves from: ReSkate-YourMusic.zip plus your-music.json.
 on:
   push:
     branches: [main]
@@ -14,9 +17,36 @@ jobs:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Version
+        id: version
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/your-music-v*-* ]]; then
+            release="${GITHUB_REF#refs/tags/your-music-v}"   # 1.1.5-2
+            echo "dll=${release%-*}-yourmusic.${release##*-}" >> "$GITHUB_OUTPUT"
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "dll=0.0.0" >> "$GITHUB_OUTPUT"
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          fi
+          echo "reskate=$(git describe --tags --abbrev=0 --match 'v[0-9]*' HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Check the PowerShell scripts parse
+        shell: pwsh
+        run: |
+          $failed = $false
+          foreach ($file in Get-ChildItem contrib/your-music -Recurse -Filter *.ps1) {
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref]$null, [ref]$errors) | Out-Null
+            foreach ($e in $errors) { Write-Host "$($file.Name):$($e.Extent.StartLineNumber): $($e.Message)"; $failed = $true }
+          }
+          if ($failed) { exit 1 }
 
       - name: Configure
-        run: cmake --preset vs2022-x64 -DDINGOSDK_BUILD_LAUNCHER_TESTS=ON "-DDINGOSDK_BACKTRACE_URL="
+        run: cmake --preset vs2022-x64 -DDINGOSDK_BUILD_LAUNCHER_TESTS=ON "-DDINGOSDK_BACKTRACE_URL=" "-DDINGOSDK_VERSION=${{ steps.version.outputs.dll }}"
 
       - name: Build
         run: cmake --build --preset release --parallel 4 --target dingosdk_runtime dingosdk_music_playback_policy_tests dingosdk_your_music_policy_tests dingosdk_your_music_choice_tests
@@ -35,16 +65,52 @@ jobs:
 
       - name: Package
         shell: pwsh
-        run: ./contrib/your-music/package.ps1 -Build build/vs2022-x64/Release -Packer packer -Out ReSkate-YourMusic.zip
+        run: ./contrib/your-music/package.ps1 -Version "${{ steps.version.outputs.dll }}" -Build build/vs2022-x64/Release -Packer packer -Out ReSkate-YourMusic.zip
+
+      - name: Update manifest
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $base = "${{ steps.version.outputs.reskate }}"
+          gh release download $base -R Dingo-Shenanigans/ReSkate -p launcher.json -O upstream-launcher.json
+          $upstream = Get-Content upstream-launcher.json -Raw | ConvertFrom-Json
+          if (-not $upstream.launcher.url.StartsWith('asset:')) { throw "Unexpected launcher url: $($upstream.launcher.url)" }
+          $zip = Get-Item ReSkate-YourMusic.zip
+          $manifest = [ordered]@{
+            schema      = 1
+            version     = "${{ steps.version.outputs.dll }}"
+            reskate     = $base
+            game_sha256 = $upstream.game.skate_sha256
+            zip         = [ordered]@{ name = $zip.Name; sha256 = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant(); size = $zip.Length }
+            launcher    = [ordered]@{
+              version = $upstream.launcher.version
+              url     = "https://github.com/Dingo-Shenanigans/ReSkate/releases/download/$base/" + $upstream.launcher.url.Substring(6)
+              sha256  = $upstream.launcher.sha256
+              size    = $upstream.launcher.size
+            }
+          }
+          $manifest | ConvertTo-Json -Depth 5 | Set-Content your-music.json
+          Get-Content your-music.json
 
       - uses: actions/upload-artifact@v4
         with:
           name: ReSkate-YourMusic
-          path: ReSkate-YourMusic.zip
+          path: |
+            ReSkate-YourMusic.zip
+            your-music.json
 
-      - name: Publish prerelease
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Publish release
+        if: steps.version.outputs.publish == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          files: ReSkate-YourMusic.zip
-          prerelease: true
+          tag_name: ${{ github.ref_name }}
+          name: Your Music ${{ steps.version.outputs.dll }}
+          body: |
+            Your Music for ReSkate, built on ReSkate ${{ steps.version.outputs.reskate }}.
+            Installed copies update themselves to this release. New install: download ReSkate-YourMusic.zip and follow HOW TO INSTALL.txt.
+          files: |
+            ReSkate-YourMusic.zip
+            your-music.json
+          prerelease: false
+          make_latest: true
